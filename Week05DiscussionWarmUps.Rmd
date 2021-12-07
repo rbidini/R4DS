@@ -1,0 +1,269 @@
+---
+title: "Week 05 Discussion Warmups"
+author: "R for Data Science"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(Lock5Data)
+library(readr)
+
+
+
+```
+
+## Getting started
+
+You will need to load any packages you want to use in the setup code chunk at the top of this document. At a minimum, you should load `tidyverse` and `Lock5Data`.
+
+__Note:__ when importing data sets, do NOT print the entire data set. Actually, you should never print the entire data set unless you are specifically asked to do so.
+
+Note2: All data sets referenced here can be found either in R directly or can be downloaded from the Lock5Stat webpage: https://www.lock5stat.com/datapage3e.html
+
+
+# Importing Data
+
+#### 1 What are the CSV and XLSX document data structures? What are some of the differences between CSV files and XLSX files? 
+
+
+__Your answer:__
+Csv files are in the form of a notepad, and easy for a computer to read and xlsx files are in the form of an excel spreadsheet which are hard for a computer to read. . 
+
+### Importing csv files:
+
+#### Q2a What are some of the differences between read.csv() and read_csv()?
+
+
+__Your answer:__
+read_csv will return the ouput as a tibble, which a tibble is an organized data frame. 
+
+read.csv returns the output as a dataframe. 
+
+
+#### Q2b When importing data using the "Import Dataset" button, what is the difference between "From text (base)" and "From text (readr)"?
+
+__Your answer:__
+Text base, just reads in the file while readr() will show you the data that is being read in the file. 
+
+
+#### Q2c. Revisit importing the chicago data from the week 04 problem set. Drag the chicago.csv file into the same folder as this Week05DiscussionWarmUps file. Compare the results from the code below (hint: check for missing data in the pm2.5 column). 
+
+
+```{r}
+chicago1 <- read.csv("chicago.csv")
+chicago2 <- read_csv("chicago.csv", n_max = 1000)
+chicago3 <- read_csv("chicago.csv", col_types = list(col_character(), col_double(), col_double(), col_date(format = ""), col_double(), col_double(), col_double(), col_double()))
+
+summary(chicago1)
+summary(chicago2)
+summary(chicago3)
+
+```
+
+
+## Importing excel data
+
+#### Q3a What is the process for importing an excel file into R? Suppose you want to save the code for importing an excel file, but you aren't sure what it is. How can you get R to give you the code needed to import an excel file programmatically? 
+
+__Your answer:__
+
+use the import data set function. 
+
+
+#### Q3b Look through the options listed when choosing Import Dataset -> Excel (some of these are also options for csv files). Explain what each of the following options does:
+
++ Sheet
++ Skip
++ NA
++ First Row as Names: first row as the 
++ Open Data Viewer: shwos what the data looks like 
+
+
+
+__Your answer:__
+
+```{r}
+
+```
+
+## Workflow
+
+#### Q4a What about sharing code? Suppose you are working on an RMD file that imports a data set for a group project. You send the file and data to your group mate, only to find that they can't import the data because their data is saved in a different location. Discuss two ways to help solve this problem.
+
+
+
+
+__Your answer:__
+Set it up as a project so all the files are there when sending the data
+
+Send you friend the data set for them to work on it. 
+
+
+#### Q4b Is it possible to import a data set directly from a website without having to download it first? For example, the SandP500 dataset can be found online at (https://www.lock5stat.com/datasets3e/SandP500.csv). Show how to import this data set without downloading it first. 
+
+```{r}
+mysand500 <- read.csv("https://www.lock5stat.com/datasets3e/SandP500.csv")
+```
+__Your answer:__
+
+## Other data formats
+
+#### Q5a Sometimes data isn't in csv or excel format. Show how to download the following text file containing information on the salary, degree, gender, and age of college instructors. Data can be downloaded [here](https://www.lock5stat.com/datasets3e/SalaryGender.txt). 
+
+Verify that your data set was imported correctly by finding the average salary of teachers in the data.
+
+__Your answer:__
+
+```{r}
+
+mySalaryData <- read.csv("https://www.lock5stat.com/datasets3e/SalaryGender.txt", sep = "") 
+
+
+mean(mySalaryData$Salary)
+
+```
+
+
+
+
+#### Q5b What other import data functions exist, and when might they each be useful?
+
+SPSS, SAS, SATA
+__Your answer:__
+
+
+
+<br><br>
+
+# Tidy data
+
+#### Q1 What are the defining features of a tidy dataset?
+
+
+__Your answer:__
+
+every row represents one observation
+
+#### Q2. For each of the following datasets, determine if they are tidy or not. If not, explain what the tidy format should look like.
+
+- CAOSExam in the Lock5Data package
+- fish_encounters in the tidyr package
+- StudentSurvey in the Lock5Data package
+- HollywoodMovies in the Lock5Data package
+
+```{r}
+View(CAOSExam)
+View(fish_encounters)
+View(StudentSurvey)
+View(HollywoodMovies)
+
+```
+
+__Your answer:__
+
+- CAOSExam in the Lock5Data package 
+- fish_encounters in the tidyr package
+- StudentSurvey in the Lock5Data package
+- HollywoodMovies in the Lock5Data package
+
+#### Q3 Consider the StudentSurvey data set, specifically focused on the variables Award, GPA, MathSAT, and VerbalSAT. Suppose we are interested in visualizing the distributions and associations between math and verbal SAT scores.
+
+```{r}
+smallstudent <- StudentSurvey %>%
+  select(Award, GPA, MathSAT, VerbalSAT)
+```
+
+#### 3a. Brainstorm different types of graphs we could draw to show the associations between math and verbal SAT scores, GPAs, and Awards. 
+
+
+__Your answer:__
+
+#### 3b. For each of the different types of graphs you drew above, would you need Math and Verbal SAT scores in different columns (not tidy)? Or would you need tidy data instead? 
+
+
+__Your answer:__
+
+
+
+<br><br>
+
+
+# Restructuring data (pivot_wider and pivot_longer)
+
+## Q1 Student SAT scores
+
+#### Q1a. Using the StudentSurvey data, use select to create a subset that is only the variables Award, GPA, MathSAT, and VerbalSAT, save this dataset as `SATwide`.  Then, restructure the SATwide data set to be in long form: create a single column that lists the type of SAT test (either MathSAT or VerbalSAT) and a corresponding column for the score, make sure that the other variables (GPA and Award) are kept out of this tidying up.  Save this as `SATtidy`.
+
+
+__Your answer:__
+
+```{r}
+
+
+smallstudent_updated <- pivot_longer(smallstudent, c(MathSAT, VerbalSAT,), names_to = "SAT Type", values_to = " SAT Score")
+
+smallstudent_updated
+```
+
+#### Q1b. Show how to create two different graphs about SAT scores, one that requires the use of the SATwide data, and the other of which requires the SATtidy data. 
+
+
+
+__Your answer:__
+
+
+```{r}
+
+```
+
+
+## Q2 Consider the HollywoodMovies data set. 
+
+Create a data subset with a column showing the value of gross income and a second column explaining what type of review  (world, foreign, domestic). Make sure to keep the name of the movie as well. Your final data set should have three columns: Movie, IncomeType, and GrossIncome. Print the first 5 rows of the data set.
+
+
+__Your answer:__
+
+```{r}
+
+```
+
+
+## Q3.  The data set `CAOSExam` in the Lock5Data package contains pre-test and post-test scores on a statistics exam for 10 students. 
+
+#### Q3a. This data is not tidy. Change the structure of the data set to be tidy, and save the new data as "tidy_caos".
+
+
+__Your answer:__
+
+```{r}
+
+```
+
+
+#### Q3b. Using your `tidy_caos` data set, can you undo what you just did? That is, starting from `tidy_caos`, how can you pull the test scores back out into separate columns for pre-test and post-test scores? Also, discuss why this wider format might be helpful in determining if students had improved their scores. 
+
+
+__Your answer:__
+
+```{r}
+
+```
+
+
+
+#### Q4. fish_encounters is a tibble in R with 114 rows and 3 columns representing fish (fish), the station where they were spotted (station), and the number of fish seen (seen). How can you make the table wider, creating columns for the station names with values in the rows representing seen or unseen while leaving the fish column unaltered?
+
+
+__Your answer:__
+
+```{r}
+head(fish_encounters)
+
+
+
+```
+
+
